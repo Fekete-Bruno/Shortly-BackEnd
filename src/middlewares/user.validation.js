@@ -1,6 +1,7 @@
+import connection from "../database/database.js";
 import userSchema from "../schemas/user.schema.js";
 
-function validateUser(req,res,next){
+async function validateUser(req,res,next){
     const user = req.body;
     const validation = userSchema.validate(user,{ abortEarly:false });
 
@@ -8,6 +9,17 @@ function validateUser(req,res,next){
         console.error(validation.error.details);
         return res.send(validation.error.details).status(422);
     }
+
+    try {
+        const query = await connection.query('SELECT email FROM users WHERE email=$1',[user.email]);
+        if(query.rows.length>0){
+            return res.sendStatus(409);
+        }; 
+    } catch (error) {
+        console.error(error);
+        return res.sendStatus(500);
+    }
+    
 
     res.locals.user = user;
 
