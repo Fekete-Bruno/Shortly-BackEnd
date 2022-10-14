@@ -2,7 +2,8 @@ import connection from "../database/database.js";
 import userSchema from "../schemas/user.schema.js";
 
 async function validateUser(req,res,next){
-    const user = req.body;
+    const { name,email,password,confirmPassword } = req.body;
+    const user = {name,email,password,confirmPassword};
     const validation = userSchema.validate(user,{ abortEarly:false });
 
     if(validation.error){
