@@ -72,4 +72,18 @@ async function openUrl(req,res){
     return res.redirect(link);
 }
 
-export {postUrl,getUrl,openUrl};
+async function deleteUrl(req,res){
+    const id = req.params.id;
+    try {
+        await connection.query(`
+            DELETE FROM links
+            WHERE id = $1;
+        `,[id]);
+    } catch (error) {
+        console.error(error);
+        return res.sendStatus(500);
+    }
+    return res.sendStatus(204);
+}
+
+export {postUrl,getUrl,openUrl,deleteUrl};

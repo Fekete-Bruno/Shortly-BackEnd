@@ -1,11 +1,12 @@
 import express from 'express';
-import { getUrl, openUrl, postUrl } from '../controllers/url.controller.js';
-import validateUrl from '../middlewares/url.validation.js';
+import { deleteUrl, getUrl, openUrl, postUrl } from '../controllers/url.controller.js';
+import { validateSession, validateUrl, validateUserUrl} from '../middlewares/url.validation.js';
 
 const urlRouter = express.Router();
 
-urlRouter.post('/urls/shorten',validateUrl,postUrl);
+urlRouter.post('/urls/shorten',validateSession,validateUrl,postUrl);
 urlRouter.get('/urls/:id',getUrl);
+urlRouter.delete('/urls/:id',validateSession,validateUserUrl,deleteUrl);
 urlRouter.get('/urls/open/:shortUrl',openUrl);
 
 export default urlRouter;
