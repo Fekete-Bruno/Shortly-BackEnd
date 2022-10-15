@@ -45,4 +45,31 @@ async function getUrl(req,res){
     return res.send(body);
 }
 
-export {postUrl,getUrl};
+async function openUrl(req,res){
+    const shortUrl = req.params.shortUrl;
+    let link = '';
+
+    try {
+        const query = await connection.query(`
+            SELECT id,link
+            FROM links
+            WHERE short_link = $1;
+        `,[shortUrl]);
+        if(query.rows.length===0){
+            return res.sendStatus(404);
+        }
+        link = query.rows[0]?.link;
+        await connection.query(`
+            UPDATE links 
+            SET visitors = visitors + 1 
+            WHERE id = $1;
+        `,[query.rows[0].id]);
+    } catch (error) {
+        console.error(error);
+        return res.sendStatus(500);
+    }
+
+    return res.redirect(link);
+}
+
+export {postUrl,getUrl,openUrl};
