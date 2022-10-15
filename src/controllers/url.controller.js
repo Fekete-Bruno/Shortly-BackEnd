@@ -20,4 +20,29 @@ async function postUrl(req,res){
     return res.status(201).send({shortUrl});
 }
 
-export {postUrl};
+async function getUrl(req,res){
+    const id = req.params.id;
+    const body = {id};
+    let url = '' ,shortUrl = '';
+    try {
+        const query = await connection.query(`
+            SELECT link,short_link
+            FROM links
+            WHERE id = $1;
+        `,[id]);
+        if(query.rows.length===0){
+            return res.sendStatus(404);
+        }
+        url = query.rows[0].link;
+        shortUrl = query.rows[0].short_link;
+
+    } catch (error) {
+        console.error(error);
+        return res.sendStatus(500);
+    }
+    body.url=url;
+    body.shortUrl = shortUrl;
+    return res.send(body);
+}
+
+export {postUrl,getUrl};
