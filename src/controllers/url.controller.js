@@ -2,16 +2,16 @@ import { nanoid } from 'nanoid';
 import connection from '../database/database.js';
 
 async function postUrl(req,res){
-    const user_id = res.locals.user_id;
+    const userId = res.locals.userId;
     const url = res.locals.url;
 
     const shortUrl = nanoid(12);
 
     try {
         await connection.query(`
-            INSERT INTO links (link,short_link,user_id)
+            INSERT INTO links (url,"shortUrl","userId")
             VALUES ($1,$2,$3);
-        `,[url,shortUrl,user_id]);
+        `,[url,shortUrl,userId]);
     } catch (error) {
         console.error(error);
         return res.sendStatus(500);
@@ -26,15 +26,15 @@ async function getUrl(req,res){
     let url = '' ,shortUrl = '';
     try {
         const query = await connection.query(`
-            SELECT link,short_link
+            SELECT url,"shortUrl"
             FROM links
             WHERE id = $1;
         `,[id]);
         if(query.rows.length===0){
             return res.sendStatus(404);
         }
-        url = query.rows[0].link;
-        shortUrl = query.rows[0].short_link;
+        url = query.rows[0].url;
+        shortUrl = query.rows[0].shortUrl;
 
     } catch (error) {
         console.error(error);
@@ -47,21 +47,21 @@ async function getUrl(req,res){
 
 async function openUrl(req,res){
     const shortUrl = req.params.shortUrl;
-    let link = '';
+    let url = '';
 
     try {
         const query = await connection.query(`
-            SELECT id,link
+            SELECT id,url
             FROM links
-            WHERE short_link = $1;
+            WHERE "shortUrl" = $1;
         `,[shortUrl]);
         if(query.rows.length===0){
             return res.sendStatus(404);
         }
-        link = query.rows[0]?.link;
+        url = query.rows[0]?.url;
         await connection.query(`
             UPDATE links 
-            SET visitors = visitors + 1 
+            SET "visitCount" = "visitCount" + 1 
             WHERE id = $1;
         `,[query.rows[0].id]);
     } catch (error) {
@@ -69,7 +69,7 @@ async function openUrl(req,res){
         return res.sendStatus(500);
     }
 
-    return res.redirect(link);
+    return res.redirect(url);
 }
 
 async function deleteUrl(req,res){

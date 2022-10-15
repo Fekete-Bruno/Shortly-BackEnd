@@ -8,20 +8,20 @@ async function validateSession(req,res,next){
 
     if (!token) return res.status(401).send(errorMessage);
 
-    let user_id = '';
+    let userId = '';
     try {
         const query = await connection.query(`
-            SELECT user_id,created_at 
+            SELECT "userId","createdAt" 
             FROM sessions 
             WHERE token = $1
         `,[token]);
-        user_id = query.rows[0]?.user_id; 
+        userId = query.rows[0]?.userId; 
 
-        if(!user_id){
+        if(!userId){
             return res.status(401).send(errorMessage);
         }
 
-        if(dayjs().diff(dayjs(query.rows[0]?.created_at),'h')>2){
+        if(dayjs().diff(dayjs(query.rows[0]?.createdAt),'h')>2){
             await connection.query(`DELETE FROM sessions WHERE token = $1;`,[token]);
             return res.status(401).send('Expired token!');
         }
@@ -30,7 +30,7 @@ async function validateSession(req,res,next){
         return res.sendStatus(500);
     }
 
-    res.locals.user_id = user_id;
+    res.locals.userId = userId;
 
     next();
 }

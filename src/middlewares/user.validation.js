@@ -1,7 +1,7 @@
 import connection from "../database/database.js";
 import userSchema from "../schemas/user.schema.js";
 
-async function validateUser(req,res,next){
+async function validateNewUser(req,res,next){
     const { name,email,password,confirmPassword } = req.body;
     const user = {name,email,password,confirmPassword};
     const validation = userSchema.validate(user,{ abortEarly:false });
@@ -28,4 +28,27 @@ async function validateUser(req,res,next){
     next();
 }
 
-export default validateUser;
+async function validateUser(req,res,next){
+    const userId = res.locals.userId;
+    try {
+        const query = await connection.query(`
+            SELECT name
+            FROM users
+            WHERE id = $1;
+        `,[userId]);
+
+        if(query.rows.length===0){
+            return res.sendStatus(404);
+        }
+        res.locals.name = query.rows[0]?.name;
+    } catch (error) {
+        console.error(error);
+        return res.sendStatus(500);
+    }
+
+    next();
+}
+
+
+
+export {validateNewUser,validateUser};

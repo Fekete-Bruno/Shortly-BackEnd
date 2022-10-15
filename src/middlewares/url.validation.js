@@ -16,18 +16,18 @@ function validateUrl(req,res,next){
 }
 
 async function validateUserUrl(req,res,next){
-    const user_id = res.locals.user_id;
+    const userId = res.locals.userId;
     const id = req.params.id;
     try {
         const query = await connection.query(`
-            SELECT user_id
+            SELECT "userId"
             FROM links
             WHERE id = $1;
         `,[id]);
         if(query.rows.length===0){
             return res.sendStatus(404);
         }
-        if(user_id!==query.rows[0]?.user_id){
+        if(userId!==query.rows[0]?.userId){
             return res.sendStatus(401);
         }
     } catch (error) {

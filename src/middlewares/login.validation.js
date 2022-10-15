@@ -15,7 +15,7 @@ async function validateLogin(req,res,next){
     }
 
     try {
-        const query = await connection.query('SELECT * FROM USERS WHERE email=$1',[email]);
+        const query = await connection.query('SELECT * FROM users WHERE email=$1',[email]);
         user = query.rows[0];
 
         if(!user){
@@ -32,7 +32,7 @@ async function validateLogin(req,res,next){
     }
 
     delete user.password;
-    res.locals.user_id=user.id;
+    res.locals.userId=user.id;
 
     next();
 }

@@ -3,13 +3,13 @@ import connection from '../database/database.js';
 
 async function postLogin(req,res){
     const token = uuid();
-    const user_id = res.locals.user_id;
+    const userId = res.locals.userId;
 
     try {
         await connection.query(`
-            INSERT INTO sessions (user_id,token)
+            INSERT INTO sessions ("userId",token)
             VALUES ($1,$2);
-        `,[user_id,token]);
+        `,[userId,token]);
     } catch (error) {
         console.error(error);
         return res.sendStatus(500);
