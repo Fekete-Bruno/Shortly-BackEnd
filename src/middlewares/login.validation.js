@@ -1,17 +1,18 @@
 import connection from "../database/database.js";
 import loginSchema from "../schemas/login.schema.js";
 import bcrypt from 'bcrypt';
+import schemaValidation from "./schemas.validation.js";
+
 
 async function validateLogin(req,res,next){
     const {email,password} = req.body;
     const userBody = {email,password};
-    const validation = loginSchema.validate(userBody, {abortEarly:false});
     const errorMessage = {error:"Wrong email or password!"}
     let user = {};
 
-    if(validation.error){
-        console.error(validation.error.details);
-        return res.status(422).send(validation.error.details);
+    const isInvalid = schemaValidation(loginSchema,userBody);
+    if(isInvalid){
+        return res.status(422).send(isInvalid);
     }
 
     try {

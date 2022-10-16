@@ -1,15 +1,15 @@
 import connection from "../database/database.js";
 import userSchema from "../schemas/user.schema.js";
+import schemaValidation from "./schemas.validation.js";
 
 async function validateNewUser(req,res,next){
     const { name,email,password,confirmPassword } = req.body;
     const user = {name,email,password,confirmPassword};
-    const validation = userSchema.validate(user,{ abortEarly:false });
     const errorMessage = "This user email already exists!"
 
-    if(validation.error){
-        console.error(validation.error.details);
-        return res.status(422).send(validation.error.details);
+    const isInvalid = schemaValidation(userSchema,user);
+    if(isInvalid){
+        return res.status(422).send(isInvalid);
     }
 
     try {

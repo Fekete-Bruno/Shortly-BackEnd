@@ -1,13 +1,13 @@
 import connection from "../database/database.js";
 import urlSchema from "../schemas/url.schema.js";
+import schemaValidation from "./schemas.validation.js";
 
 function validateUrl(req,res,next){
     const { url } = req.body;
-    const validation = urlSchema.validate({url},{abortEarly:false});
 
-    if(validation.error){
-        console.error(validation.error.details);
-        return res.status(422).send(validation.error.details);
+    const isInvalid = schemaValidation(urlSchema,{url});
+    if(isInvalid){
+        return res.status(422).send(isInvalid);
     }
 
     res.locals.url = url;
