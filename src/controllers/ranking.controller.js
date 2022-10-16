@@ -1,7 +1,7 @@
 import connection  from "../database/database.js";
 
 async function getRanking(req,res){
-    let body = [] 
+    let body = [];
 
     try {
         const query = await connection.query(`
